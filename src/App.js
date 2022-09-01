@@ -1,23 +1,51 @@
-import logo from './logo.svg';
-import './App.css';
+import { BrowserRouter, Route, Routes } from "react-router-dom";
+import "./App.css";
+import Admin from "./pages/Admin";
+import Asylum from "./pages/Asylum";
+import Crime from "./pages/Crime";
+import Landing from "./pages/Landing";
+import List from "./pages/List";
+import Login from "./pages/Login";
+import Register from "./pages/Register";
+import Loading from "./components/Loading";
+
+import useAuthContext from "./hooks/useAuthContext";
 
 function App() {
+  const { authIsReady, user } = useAuthContext();
   return (
     <div className="App">
-      <header className="App-header">
-        <img src={logo} className="App-logo" alt="logo" />
-        <p>
-          Edit <code>src/App.js</code> and save to reload.
-        </p>
-        <a
-          className="App-link"
-          href="https://reactjs.org"
-          target="_blank"
-          rel="noopener noreferrer"
-        >
-          Learn React
-        </a>
-      </header>
+      {authIsReady ? (
+        <BrowserRouter>
+          <Routes>
+            <Route path="/" element={<Landing />} />
+            <Route path="/login" element={!user ? <Login /> : <Landing />} />
+            <Route
+              path="/register"
+              element={!user ? <Register /> : <Landing />}
+            />
+            <Route
+              path="/crimeform"
+              element={
+                user && user.displayName !== "asylum" ? <Crime /> : <Landing />
+              }
+            />
+            <Route
+              path="/asylumform"
+              element={user ? <Asylum /> : <Landing />}
+            />
+            <Route path="/list" element={user ? <List /> : <Landing />} />
+            <Route
+              path="/admin"
+              element={
+                user && user.displayName === "admin" ? <Admin /> : <Landing />
+              }
+            />
+          </Routes>
+        </BrowserRouter>
+      ) : (
+        <Loading />
+      )}
     </div>
   );
 }
